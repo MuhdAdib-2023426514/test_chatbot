@@ -6,20 +6,13 @@ import json
 import pandas as pd
 import duckdb
 from datetime import datetime
-import streamlit as st
-from azure.ai.inference import ChatCompletionsClient
-from azure.ai.inference.models import SystemMessage, UserMessage
-from azure.core.credentials import AzureKeyCredential
+from google import genai
+import os
+import dotenv
 
-
-endpoint = "https://models.github.ai/inference"
-model = "openai/gpt-5"
-token = "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"
-
-client = ChatCompletionsClient(
-    endpoint=endpoint,
-    credential=AzureKeyCredential(token),
-)
+dotenv.load_dotenv()
+# The client gets the API key from the environment variable `GEMINI_API_KEY`.
+client = genai.Client(api_key=os.getenv("GEMINI_API_KEY"))
 
 class AgentState(TypedDict):
     """State of the agent workflow"""
@@ -373,11 +366,11 @@ blood_donation_events.csv
 * This is the **primary column for all time-based queries**
 * Use this column for:
 
-  * “today”
-  * “this week”
-  * “this month”
-  * “between dates”
-  * “upcoming events”
+  * "today"
+  * "this week"
+  * "this month"
+  * "between dates"
+  * "upcoming events"
 
 ---
 
@@ -422,8 +415,8 @@ blood_donation_events.csv
   * Blood centers
 * Useful for:
 
-  * “events by organizer”
-  * “which organizer has the most events”
+  * "events by organizer"
+  * "which organizer has the most events"
 
 ---
 
@@ -505,8 +498,8 @@ blood_donation_events.csv
 * Ignore `event_day` for logic
 * If user asks:
 
-  * “this week” → calculate based on current date
-  * “upcoming” → `event_date >= today`
+  * "this week" → calculate based on current date
+  * "upcoming" → `event_date >= today`
 
 ---
 
@@ -538,9 +531,9 @@ User may ask questions in:
 
 Examples:
 
-* “berapa jumlah event minggu ini”
-* “total donor target bulan April”
-* “event di Selangor”
+* "berapa jumlah event minggu ini"
+* "total donor target bulan April"
+* "event di Selangor"
 
 Interpret them correctly.
 
@@ -625,17 +618,17 @@ Your role is to:
 * **Never hallucinate columns or tables**
 * **Never assume missing information**
 
-If unsure → return `NOT_ANSWERABLE`."""
+If unsure → return `NOT_ANSWERABLE`.
 
-    response = client.complete(
-    messages=[
-        SystemMessage(OPTIMIZED_SQL_SYSTEM_PROMPT),
-        UserMessage(prompt),
-    ],
-    model=model
+{OPTIMIZED_SQL_SYSTEM_PROMPT}"""
+
+    
+    response = client.models.generate_content(
+        model="gemini-2.5-flash",
+        contents=prompt
     )
 
-    raw_response = response.choices[0].message.content
+    raw_response = response.text.strip()
     
     print(f"DEBUG - Raw LLM Response: {repr(raw_response)}")
     
@@ -838,15 +831,12 @@ Query Results:
 
 Please generate a friendly and clear response based on the query results."""
 
-    response = client.complete(
-    messages=[
-        SystemMessage(ANALYSIS_AGENT_PROMPT),
-        UserMessage(prompt)
-    ],
-    model=model
+    response = client.models.generate_content(
+        model="gemini-2.5-flash",
+        contents=prompt
     )
 
-    final_answer = response.choices[0].message.content.strip()
+    final_answer = response.text.strip()
     state["final_answer"] = final_answer
     
     return state

@@ -6,8 +6,12 @@ readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
     "azure-ai-inference>=1.0.0b9",
+    "dotenv>=0.9.9",
     "duckdb>=1.4.3",
+    "google>=3.0.0",
+    "google-genai>=1.56.0",
     "langgraph>=1.0.5",
     "ollama>=0.6.1",
+    "python-dotenv>=1.2.1",
     "streamlit>=1.52.2",
 ]
