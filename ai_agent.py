@@ -213,7 +213,7 @@ def executer_agent(state: AgentState) -> AgentState:
     question = state.get("question", "")
     
     # Define the full path to the CSV file
-    csv_path = r"C:\Users\Inteleon\Desktop\Adib\test_chatbot\blood_donation_events.csv"
+    csv_path = "blood_donation_events.csv"
     
     try:
         # Debug: Log the SQL query
